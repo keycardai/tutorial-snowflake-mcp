@@ -1,0 +1,14 @@
+services:
+  snowflake-mcp:
+    build: .
+    ports:
+      - "${PORT:-3100}:${PORT:-3100}"
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:${PORT:-3100}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
