@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import express from "express";
 import {
   keycardMetadataRouter,
@@ -148,8 +149,7 @@ export function createApp(): express.Express {
 }
 
 // Only start when run directly (not imported for tests)
-const isMainModule = process.argv[1]?.endsWith("server.ts") ||
-  process.argv[1]?.endsWith("server.js");
+const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
 
 if (isMainModule) {
   const port = parseInt(process.env.PORT || "3100", 10);
