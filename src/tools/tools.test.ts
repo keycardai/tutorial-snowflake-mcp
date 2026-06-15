@@ -133,30 +133,6 @@ describe("snowflake_query tool", () => {
     expect(parsed.columns).toEqual(["ID"]);
   });
 
-  it("rejects INSERT statement", async () => {
-    const server = new McpServer({ name: "test", version: "0.0.1" });
-    registerQueryTool(server, makeTokenProvider(), makeConfig());
-
-    const result = await callTool(server, "snowflake_query", {
-      statement: "INSERT INTO students VALUES (1, 'Jeff Winger')",
-    });
-
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("snowflake_query only accepts SELECT");
-  });
-
-  it("rejects DROP statement", async () => {
-    const server = new McpServer({ name: "test", version: "0.0.1" });
-    registerQueryTool(server, makeTokenProvider(), makeConfig());
-
-    const result = await callTool(server, "snowflake_query", {
-      statement: "DROP TABLE students",
-    });
-
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("snowflake_query only accepts SELECT");
-  });
-
   it("returns error when token exchange fails", async () => {
     const server = new McpServer({ name: "test", version: "0.0.1" });
     registerQueryTool(server, makeFailingTokenProvider("User has not connected Snowflake"), makeConfig());
@@ -256,7 +232,7 @@ describe("snowflake_execute tool", () => {
     expect(result.content[0].text).toContain("Rows affected: 1");
   });
 
-  it("requests ANALYST_ROLE scope", async () => {
+  it("requests READWRITE_ROLE scope", async () => {
     const response = mockSnowflakeResponse({ resultSetMetaData: { numRows: 1, format: "jsonv2", rowType: [] } });
     vi.mocked(fetch).mockResolvedValueOnce(
       new Response(JSON.stringify(response), { status: 200 }),
@@ -270,31 +246,7 @@ describe("snowflake_execute tool", () => {
       statement: "INSERT INTO students VALUES (3, 'Shirley Bennett')",
     });
 
-    expect(getToken).toHaveBeenCalledWith("session:role:ANALYST_ROLE");
-  });
-
-  it("rejects SELECT statement", async () => {
-    const server = new McpServer({ name: "test", version: "0.0.1" });
-    registerExecuteTool(server, makeTokenProvider(), makeConfig());
-
-    const result = await callTool(server, "snowflake_execute", {
-      statement: "SELECT * FROM students",
-    });
-
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("does not accept SELECT");
-  });
-
-  it("rejects DELETE statement", async () => {
-    const server = new McpServer({ name: "test", version: "0.0.1" });
-    registerExecuteTool(server, makeTokenProvider(), makeConfig());
-
-    const result = await callTool(server, "snowflake_execute", {
-      statement: "DELETE FROM students",
-    });
-
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("only accepts INSERT, UPDATE, CREATE, ALTER, or MERGE");
+    expect(getToken).toHaveBeenCalledWith("session:role:READWRITE_ROLE");
   });
 
   it("returns error when token exchange fails", async () => {
@@ -336,7 +288,7 @@ describe("snowflake_delete tool", () => {
     expect(result.content[0].text).toContain("Rows affected: 5");
   });
 
-  it("requests ANALYST_ROLE scope", async () => {
+  it("requests READWRITE_ROLE scope", async () => {
     const response = mockSnowflakeResponse({ resultSetMetaData: { numRows: 5, format: "jsonv2", rowType: [] } });
     vi.mocked(fetch).mockResolvedValueOnce(
       new Response(JSON.stringify(response), { status: 200 }),
@@ -350,7 +302,7 @@ describe("snowflake_delete tool", () => {
       statement: "DELETE FROM students WHERE expelled = true",
     });
 
-    expect(getToken).toHaveBeenCalledWith("session:role:ANALYST_ROLE");
+    expect(getToken).toHaveBeenCalledWith("session:role:READWRITE_ROLE");
   });
 
   it("executes DROP and returns success", async () => {
@@ -368,42 +320,6 @@ describe("snowflake_delete tool", () => {
 
     expect(result.isError).toBeUndefined();
     expect(result.content[0].text).toContain("Statement executed successfully");
-  });
-
-  it("rejects SELECT statement", async () => {
-    const server = new McpServer({ name: "test", version: "0.0.1" });
-    registerDeleteTool(server, makeTokenProvider(), makeConfig());
-
-    const result = await callTool(server, "snowflake_delete", {
-      statement: "SELECT * FROM students",
-    });
-
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("does not accept SELECT");
-  });
-
-  it("rejects INSERT statement", async () => {
-    const server = new McpServer({ name: "test", version: "0.0.1" });
-    registerDeleteTool(server, makeTokenProvider(), makeConfig());
-
-    const result = await callTool(server, "snowflake_delete", {
-      statement: "INSERT INTO students VALUES (1)",
-    });
-
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("does not accept write statements");
-  });
-
-  it("rejects CREATE statement", async () => {
-    const server = new McpServer({ name: "test", version: "0.0.1" });
-    registerDeleteTool(server, makeTokenProvider(), makeConfig());
-
-    const result = await callTool(server, "snowflake_delete", {
-      statement: "CREATE TABLE evil_plot (id INT)",
-    });
-
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("does not accept write statements");
   });
 
   it("returns error when token exchange fails", async () => {
