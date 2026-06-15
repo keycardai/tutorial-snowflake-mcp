@@ -42,13 +42,13 @@ Each tool requests a different Snowflake role via Keycard token exchange:
 | Tool | Snowflake Role | Allowed Statements |
 |------|----------------|-------------------|
 | `snowflake_query` | `READONLY_ROLE` | SELECT, SHOW, DESCRIBE |
-| `snowflake_execute` | `ANALYST_ROLE` | INSERT, UPDATE, CREATE, ALTER, MERGE |
-| `snowflake_delete` | `ANALYST_ROLE` | DELETE, DROP, TRUNCATE |
+| `snowflake_execute` | `READWRITE_ROLE` | INSERT, UPDATE, CREATE, ALTER, MERGE |
+| `snowflake_delete` | `READWRITE_ROLE` | DELETE, DROP, TRUNCATE |
 
 Keycard policies can allow or deny access based on which role is requested. For
 example, you might:
 - Always allow `READONLY_ROLE` (read queries)
-- Require human approval for `ANALYST_ROLE` (write/delete operations)
+- Require human approval for `READWRITE_ROLE` (write/delete operations)
 
 When a tool requests a role that requires approval, Keycard prompts the user
 before issuing the token.

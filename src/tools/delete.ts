@@ -4,7 +4,7 @@ import type { SnowflakeTokenProvider } from "../tokenProvider.js";
 import { executeSnowflakeStatement, SnowflakeError } from "../snowflake.js";
 import { validateStatement } from "../validation.js";
 
-const SNOWFLAKE_SCOPE = "session:role:ANALYST_ROLE";
+const SNOWFLAKE_SCOPE = "session:role:READWRITE_ROLE";
 
 export function registerDeleteTool(
   server: McpServer,
@@ -44,7 +44,7 @@ export function registerDeleteTool(
           database: database ?? config.database,
           schema: schema ?? config.schema,
           warehouse: warehouse ?? config.warehouse,
-          role: "ANALYST_ROLE",
+          role: "READWRITE_ROLE",
         });
 
         return {
