@@ -93,4 +93,5 @@ questions about your data:
 
 ## License
 
-MIT
+MIT — see [LICENSE](./LICENSE). The Keycard name and logo are trademarks;
+[TRADEMARKS.md](./TRADEMARKS.md) states how they may be used.
